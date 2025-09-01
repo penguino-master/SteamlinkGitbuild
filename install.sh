@@ -18,7 +18,7 @@ python3 -m pip install --upgrade pip setuptools wheel --break-system-packages
 
 # Create target directory
 sudo mkdir -p /opt/steamlink-gui
-sudo cp -r ./* /opt/steamlink-gui/
+sudo cp -r ./SteamlinkGitbuild/* /opt/steamlink-gui/
 
 # Make launcher command
 echo '#!/bin/bash
