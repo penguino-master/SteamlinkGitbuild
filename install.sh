@@ -1,24 +1,25 @@
 #!/bin/bash
 set -e
 
-echo "🔧 Installing Steamlink GUI system-wide..."
+echo "🔧 Installing Steamlink GUI system-wide for Raspberry Pi OS..."
 
-# Update and install dependencies
+# Update and install system packages
 sudo apt update
 sudo apt install -y \
     python3 \
     python3-pip \
-    python3-pyqt6 \
-    python3-pyqt6.qt6 \
-    python3-pyqt6.qt6webkit \
+    python3-pyqt5 \
+    python3-pyqt5.qtquick \
+    python3-pyqt5.qtsvg \
     python3-pygame \
     git
 
 # Upgrade pip and allow system installs
 python3 -m pip install --upgrade pip setuptools wheel --break-system-packages
 
-# Install any additional Python packages not in apt
+# Install anything missing from apt using pip
 python3 -m pip install \
+    PyQt6 \
     requests \
     --break-system-packages
 
@@ -32,4 +33,4 @@ python3 /opt/steamlink-gui/main.py' | sudo tee /usr/local/bin/steamlink-gui > /d
 sudo chmod +x /usr/local/bin/steamlink-gui
 
 echo "✅ Install complete!"
-echo "You can run the app with: steamlink-gui"
+echo "Run the app with: steamlink-gui"
