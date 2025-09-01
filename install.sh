@@ -16,11 +16,11 @@ sudo apt install -y \
 # Upgrade pip and allow system installs
 python3 -m pip install --upgrade pip setuptools wheel --break-system-packages
 
-# Create target directory
+# Create target directory and copy all project files
 sudo mkdir -p /opt/steamlink-gui
-sudo cp -r ./SteamlinkGitbuild/* /opt/steamlink-gui/
+sudo cp -r ./* /opt/steamlink-gui/
 
-# Make launcher command
+# Create a global launcher command
 echo '#!/bin/bash
 python3 /opt/steamlink-gui/main.py' | sudo tee /usr/local/bin/steamlink-gui > /dev/null
 sudo chmod +x /usr/local/bin/steamlink-gui
