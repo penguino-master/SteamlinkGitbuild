@@ -1,32 +1,35 @@
 #!/bin/bash
 set -e
 
-APP_DIR="/opt/steamlink-gui"
-REPO_URL="https://github.com/penguino-master/SteamlinkGitbuild.git"
+echo "🔧 Installing Steamlink GUI system-wide..."
 
-echo "🔹 Installing system dependencies..."
+# Update and install dependencies
 sudo apt update
-sudo apt install -y python3 python3-pip git
+sudo apt install -y \
+    python3 \
+    python3-pip \
+    python3-pyqt6 \
+    python3-pyqt6.qt6 \
+    python3-pyqt6.qt6webkit \
+    python3-pygame \
+    git
 
-if [ ! -d "$APP_DIR" ]; then
-    echo "🔹 Cloning repo to $APP_DIR..."
-    sudo git clone "$REPO_URL" "$APP_DIR"
-else
-    echo "🔹 Repo exists, pulling latest changes..."
-    cd "$APP_DIR"
-    sudo git pull
-fi
+# Upgrade pip and allow system installs
+python3 -m pip install --upgrade pip setuptools wheel --break-system-packages
 
-echo "🔹 Installing Python dependencies..."
-cd "$APP_DIR"
-sudo pip3 install -r requirements.txt
+# Install any additional Python packages not in apt
+python3 -m pip install \
+    requests \
+    --break-system-packages
 
-echo "🔹 Creating steamlink-gui launcher..."
-sudo tee /usr/local/bin/steamlink-gui > /dev/null <<EOF
-#!/bin/bash
-cd $APP_DIR
-python3 main.py
-EOF
+# Create target directory
+sudo mkdir -p /opt/steamlink-gui
+sudo cp -r ./* /opt/steamlink-gui/
+
+# Make launcher command
+echo '#!/bin/bash
+python3 /opt/steamlink-gui/main.py' | sudo tee /usr/local/bin/steamlink-gui > /dev/null
 sudo chmod +x /usr/local/bin/steamlink-gui
 
-echo "✅ Installation complete! Run 'steamlink-gui' to start the app."
+echo "✅ Install complete!"
+echo "You can run the app with: steamlink-gui"
