@@ -22,7 +22,7 @@ sudo cp -r ./* /opt/steamlink-gui/
 
 # Create a global launcher command
 echo '#!/bin/bash
-python3 /opt/steamlink-gui/SteamlinkGitbuild/main.py' | sudo tee /usr/local/bin/steamlink-gui > /dev/null
+python3 /opt/steamlink-gui/main.py' | sudo tee /usr/local/bin/steamlink-gui > /dev/null
 sudo chmod +x /usr/local/bin/steamlink-gui
 
 echo "✅ Install complete!"
