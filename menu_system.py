@@ -39,24 +39,6 @@ class SystemMenu(QWidget):
         top_row.addWidget(exit_btn)
         layout.addLayout(top_row)
 
-        # --- Resolution section (dropdown + apply) ---
-        res_label = QLabel("Change Resolution")
-        res_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(res_label)
-
-        self.res_dropdown = QComboBox()
-        self.res_dropdown.addItem("1080p60 (Recommended)", "1080p")
-        self.res_dropdown.addItem("1440p (Beta)", "1440p")
-        layout.addWidget(self.res_dropdown)
-
-        self.apply_res_btn = self._make_button("Apply Resolution", self.apply_resolution)
-        layout.addWidget(self.apply_res_btn)
-
-        # Disable apply if tvservice not present (useful for WSL/testing)
-        if not shutil.which("tvservice"):
-            self.apply_res_btn.setEnabled(False)
-            self.apply_res_btn.setToolTip("Disabled: tvservice not found (not running on Raspberry Pi)")
-
         layout.addStretch()  # push everything to top
 
     def _make_button(self, label, callback):
