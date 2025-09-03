@@ -23,9 +23,11 @@ Launch apps like **Steam Link** or **Kodi** using a controller, keyboard, or mou
 
 ## 🚀 Installation
 
-Run this **one-liner** on your Pi to install Steamlink GUI:
+Run this on your Pi to install Steamlink GUI:
+
+```bash
+sudo apt install python3-pyqt6
 
 ```bash
 curl -sSL https://raw.githubusercontent.com/penguino-master/SteamlinkGitbuild/main/install.sh | bash
-
 
