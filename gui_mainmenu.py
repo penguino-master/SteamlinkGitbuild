@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import (
     QApplication, QWidget, QLabel, QPushButton,
-    QVBoxLayout, QHBoxLayout, QStackedLayout
+    QVBoxLayout, QHBoxLayout, QStackedLayout, QSizePolicy
 )
 from PyQt6.QtCore import Qt
 from controller import ControllerThread
@@ -16,11 +16,17 @@ class SteamlinkGUI(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Steamlink Companion UI")
-        self.setGeometry(100, 100, 800, 480)
+        self.showFullScreen()
 
         # Layouts
         layout = QHBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+
         sidebar = QVBoxLayout()
+        sidebar.setContentsMargins(0, 0, 0, 0)
+        sidebar.setSpacing(10)
+
         self.pages = QStackedLayout()
 
         # Device Info
@@ -47,7 +53,9 @@ class SteamlinkGUI(QWidget):
 
         for i, (text, widget) in enumerate(buttons_info):
             btn = AnimatedButton(text, lambda t=text: self.switch_page(t), self)
-            btn.setFixedHeight(40)
+            btn.setMinimumHeight(60)
+            btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+
             sidebar.addWidget(btn)
             self.menu_buttons.append(btn)
 

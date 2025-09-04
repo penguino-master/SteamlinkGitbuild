@@ -33,6 +33,29 @@ sudo apt install python3-pyqt6
 sudo curl -sSL https://raw.githubusercontent.com/penguino-master/SteamlinkGitbuild/main/install.sh | bash
 ```
 
+Note for PI os LITE users:
+
+PI os lite doesn't come with the ability to display a gui application off the bat, so a few more things
+need to be installed to get that to work:
+
+```bash
+sudo apt update
+sudo apt install -y --no-install-recommends \
+    xserver-xorg \
+    x11-xserver-utils \
+    xinit \
+    openbox \
+    fonts-dejavu-core
+```
+
+You will also have to create this file:
+
+```bash
+echo 'steamlink-gui' > ~/.xinitrc
+```
+
+You can test to see if the xserver runs with startx, but the next steps will have the app and it's xserver run on startup.
+
 ---
 
 Setup Enable on startup
@@ -40,20 +63,21 @@ Setup Enable on startup
 You can make the Steamlink GUI command run on startup by creating a systemctl service, which can be created by doing the following:
 
 ```bash
-sudo tee /etc/systemd/system/steamlink-gui.service > /dev/null <<EOF
+sudo tee /etc/systemd/system/steamlink.service > /dev/null <<EOF
 [Unit]
-Description=Steamlink GUI
-After=graphical.target
+Description=Steamlink GUI (X11 Kiosk)
+After=systemd-user-sessions.service
 
 [Service]
-ExecStart=/usr/local/bin/steamlink-gui
-Restart=always
 User=pi
-Environment=DISPLAY=:0
+PAMName=login
 Environment=XAUTHORITY=/home/pi/.Xauthority
+Environment=DISPLAY=:0
+ExecStart=/usr/bin/startx
+Restart=always
 
 [Install]
-WantedBy=graphical.target
+WantedBy=multi-user.target
 EOF
 ```
 
@@ -76,7 +100,6 @@ might work with other formats.
 The current programs supported by the app are:
 
 Steam Link | steamlink | steamlink.png
-Kodi | kodi | kodi.png
 
 An example of an additional program could be retropi, in which it would look like:
 
