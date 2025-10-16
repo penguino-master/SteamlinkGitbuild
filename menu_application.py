@@ -15,8 +15,8 @@ class ApplicationMenu(QWidget):
     def __init__(self):
         super().__init__()
         main_layout = QVBoxLayout(self)
+        main_layout.setContentsMargins(20, 20, 20, 20)  # Added 20px top margin
         main_layout.setSpacing(0)
-        main_layout.setContentsMargins(20, 20, 20, 20)
 
         # Grid for app icons
         grid = QGridLayout()
@@ -24,7 +24,6 @@ class ApplicationMenu(QWidget):
         grid.setContentsMargins(0, 0, 0, 0)
         main_layout.addLayout(grid, stretch=0)
         main_layout.setAlignment(grid, Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
-
 
         # Paths
         base_dir = os.path.dirname(__file__)

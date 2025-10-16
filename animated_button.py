@@ -3,11 +3,11 @@ from PyQt6.QtCore import Qt, QPropertyAnimation, QEasingCurve, QRect, QTimer
 
 
 class AnimatedButton(QPushButton):
-    def __init__(self, label: str = "", action_callback=None, animation_speed=300, parent=None):
+    def __init__(self, label: str = "", action_callback=None, animation_speed=200, parent=None):
         # Back-compat: allow signature (label, callback, parent)
         if parent is None and not isinstance(animation_speed, (int, float)):
             parent = animation_speed
-            animation_speed = 300
+            animation_speed = 200
 
         super().__init__(label, parent)
 
@@ -18,6 +18,7 @@ class AnimatedButton(QPushButton):
         self._orig_rect = None
         self.is_tile = False  # set to True via set_tile_mode() for app tiles
 
+        self.setFlat(True)  # Disable Qt's default pressed visual (sunken offset/shift)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
 
@@ -44,6 +45,7 @@ class AnimatedButton(QPushButton):
         }}
         QPushButton:pressed {{
             background-color: #505357;
+            border: none;
         }}
         QPushButton:focus {{ outline: none; }}
         """
@@ -66,6 +68,10 @@ class AnimatedButton(QPushButton):
         }
         QPushButton:hover {
             background-color: rgba(255,255,255,0.08);
+            border-radius: 12px;
+        }
+        QPushButton:focus {
+            border: 2px solid #1e90ff;
             border-radius: 12px;
         }
         """)

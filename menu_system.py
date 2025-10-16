@@ -19,8 +19,8 @@ class SystemMenu(QWidget):
         super().__init__()
 
         layout = QVBoxLayout(self)
+        layout.setContentsMargins(20, 20, 20, 20)  # 20px top and left margins (already correct)
         layout.setSpacing(10)
-        layout.setContentsMargins(12, 12, 12, 12)
 
         # Title
         title = QLabel("System Options")

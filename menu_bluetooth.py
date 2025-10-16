@@ -5,7 +5,6 @@ from PyQt6.QtCore import Qt, QTimer, QThread, pyqtSignal
 import subprocess
 import time
 
-# Import your AnimatedButton
 try:
     from animated_button import AnimatedButton
 except Exception:
@@ -46,8 +45,8 @@ class BluetoothMenu(QWidget):
     def __init__(self):
         super().__init__()
         self.layout = QVBoxLayout(self)
+        self.layout.setContentsMargins(20, 20, 20, 20)  # Added 20px top margin
         self.layout.setSpacing(10)
-        self.layout.setContentsMargins(12, 12, 12, 12)
 
         # Title
         title = QLabel("Bluetooth Devices")

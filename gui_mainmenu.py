@@ -24,7 +24,7 @@ class SteamlinkGUI(QWidget):
         layout.setSpacing(0)
 
         sidebar = QVBoxLayout()
-        sidebar.setContentsMargins(0, 0, 0, 0)
+        sidebar.setContentsMargins(20, 20, 0, 0)  # Added 20px top margin
         sidebar.setSpacing(10)
 
         self.pages = QStackedLayout()
@@ -53,8 +53,8 @@ class SteamlinkGUI(QWidget):
 
         for i, (text, widget) in enumerate(buttons_info):
             btn = AnimatedButton(text, lambda t=text: self.switch_page(t), self)
-            btn.setMinimumHeight(60)
-            btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+            btn.setMinimumHeight(100)  # Kept at 100px per your change
+            btn.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)  # Minimum width, fixed height
 
             sidebar.addWidget(btn)
             self.menu_buttons.append(btn)
@@ -64,8 +64,9 @@ class SteamlinkGUI(QWidget):
 
         sidebar.addStretch()
 
+        # Sidebar stretch for ~0.3x width
         layout.addLayout(sidebar, 1)
-        layout.addLayout(self.pages, 3)
+        layout.addLayout(self.pages, 4)
 
         # Default focus on first button
         if self.menu_buttons:

@@ -4,7 +4,6 @@ import subprocess
 import re
 import shutil
 
-# Import your AnimatedButton
 try:
     from animated_button import AnimatedButton
 except Exception:
@@ -15,8 +14,8 @@ class VolumeMenu(QWidget):
     def __init__(self):
         super().__init__()
         layout = QVBoxLayout(self)
+        layout.setContentsMargins(20, 20, 20, 20)  # Added 20px top margin
         layout.setSpacing(10)
-        layout.setContentsMargins(12, 12, 12, 12)
 
         # Title
         title = QLabel("Volume Control")
