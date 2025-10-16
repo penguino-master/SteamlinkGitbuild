@@ -27,11 +27,11 @@ class VolumeMenu(QWidget):
         btn_row = QHBoxLayout()
         vol_up = self._make_button("Volume +", lambda: self.change_volume(+5))
         vol_down = self._make_button("Volume -", lambda: self.change_volume(-5))
-        mute_btn = self._make_button("Mute", self.toggle_mute)
+        self.mute_btn = self._make_button("Mute", self.toggle_mute)
 
         btn_row.addWidget(vol_down)
         btn_row.addWidget(vol_up)
-        btn_row.addWidget(mute_btn)
+        btn_row.addWidget(self.mute_btn)
 
         layout.addLayout(btn_row)
 
@@ -88,16 +88,27 @@ class VolumeMenu(QWidget):
         if not shutil.which("pactl"):
             print("pactl not found, volume control not available.")
             return
+
+        is_muted = self.get_mute_state()
+        if is_muted:
+            # Unmute first if currently muted
+            subprocess.run(["pactl", "set-sink-mute", "@DEFAULT_SINK@", "toggle"])
+
         current = self.get_volume()
         if current is not None:
             new_volume = max(0, min(100, current + delta))
             subprocess.run(["pactl", "set-sink-volume", "@DEFAULT_SINK@", f"{new_volume}%"])
+
+        # Update immediately for responsiveness
+        self.update_volume()
 
     def toggle_mute(self):
         if not shutil.which("pactl"):
             print("pactl not found, mute not available.")
             return
         subprocess.run(["pactl", "set-sink-mute", "@DEFAULT_SINK@", "toggle"])
+        # Update immediately for responsiveness
+        self.update_volume()
 
     def get_volume(self):
         try:
@@ -108,8 +119,25 @@ class VolumeMenu(QWidget):
         except Exception:
             return None
 
+    def get_mute_state(self):
+        try:
+            result = subprocess.run(["pactl", "get-sink-mute", "@DEFAULT_SINK@"],
+                                    capture_output=True, text=True)
+            return "Mute: yes" in result.stdout
+        except Exception:
+            return False
+
     def update_volume(self):
         current = self.get_volume()
-        if current is not None:
+        is_muted = self.get_mute_state()
+        if is_muted:
+            self.volume_bar.setValue(0)
+            self.volume_bar.setFormat("Muted")
+            self.mute_btn.setText("Unmute")
+        elif current is not None:
             self.volume_bar.setValue(current)
             self.volume_bar.setFormat(f"{current}%")
+            self.mute_btn.setText("Mute")
+        else:
+            self.volume_bar.setFormat("Unknown")
+            self.mute_btn.setText("Mute")

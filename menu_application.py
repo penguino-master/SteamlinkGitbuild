@@ -59,12 +59,24 @@ class ApplicationMenu(QWidget):
                                 btn.setIcon(QIcon(icon_path))
                                 btn.setIconSize(QSize(200, 300))
                                 btn.setFixedSize(200, 300)  # enforce 2:3 ratio
+                                btn.set_tile_mode()  # Enable tile mode for icon buttons
                             else:
                                 btn = QPushButton("")
                                 btn.setIcon(QIcon(icon_path))
                                 btn.setIconSize(QSize(200, 300))
                                 btn.setFixedSize(200, 300)
                                 btn.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+                                # Apply tile-like style for fallback
+                                btn.setStyleSheet("""
+                                    QPushButton {
+                                        background: transparent;
+                                        border: none;
+                                    }
+                                    QPushButton:hover {
+                                        background-color: rgba(255,255,255,0.08);
+                                        border-radius: 12px;
+                                    }
+                                """)
                                 btn.clicked.connect(lambda _, cmd=command: self.launch_program(cmd))
                         else:
                             btn = self._make_text_button(name, command)

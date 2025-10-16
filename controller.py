@@ -1,7 +1,7 @@
 import pygame
 from threading import Thread
 import time
-from PyQt6.QtCore import QEvent, Qt
+from PyQt6.QtCore import QEvent, Qt, QTimer
 from PyQt6.QtGui import QKeyEvent
 from PyQt6.QtWidgets import QApplication
 
@@ -10,13 +10,6 @@ class ControllerThread(Thread):
     def __init__(self, gui):
         super().__init__(daemon=True)
         self.gui = gui
-
-    def post_key(self, key):
-        """Post a Qt key press + release event to the GUI."""
-        press = QKeyEvent(QEvent.Type.KeyPress, key, Qt.KeyboardModifier.NoModifier)
-        release = QKeyEvent(QEvent.Type.KeyRelease, key, Qt.KeyboardModifier.NoModifier)
-        QApplication.postEvent(self.gui, press)
-        QApplication.postEvent(self.gui, release)
 
     def run(self):
         pygame.init()
@@ -36,28 +29,28 @@ class ControllerThread(Thread):
 
             # Up / Down
             if hat[1] == 1 or axis_y < -0.5:
-                self.post_key(Qt.Key.Key_Up)
+                QTimer.singleShot(0, lambda: self.gui.handle_key(Qt.Key.Key_Up))
                 time.sleep(0.2)
             elif hat[1] == -1 or axis_y > 0.5:
-                self.post_key(Qt.Key.Key_Down)
+                QTimer.singleShot(0, lambda: self.gui.handle_key(Qt.Key.Key_Down))
                 time.sleep(0.2)
 
             # Left / Right
             if hat[0] == -1:
-                self.post_key(Qt.Key.Key_Left)
+                QTimer.singleShot(0, lambda: self.gui.handle_key(Qt.Key.Key_Left))
                 time.sleep(0.2)
             elif hat[0] == 1:
-                self.post_key(Qt.Key.Key_Right)
+                QTimer.singleShot(0, lambda: self.gui.handle_key(Qt.Key.Key_Right))
                 time.sleep(0.2)
 
             # A button = Enter
             if joystick.get_button(0):
-                self.post_key(Qt.Key.Key_Return)
+                QTimer.singleShot(0, lambda: self.gui.handle_key(Qt.Key.Key_Return))
                 time.sleep(0.25)
 
             # B button = Escape (could be mapped to "back" later)
             if joystick.get_button(1):
-                self.post_key(Qt.Key.Key_Escape)
+                QTimer.singleShot(0, lambda: self.gui.handle_key(Qt.Key.Key_Escape))
                 time.sleep(0.25)
 
             clock.tick(30)

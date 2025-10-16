@@ -33,11 +33,17 @@ class AnimatedButton(QPushButton):
         border = "2px solid #1e90ff;" if focused else "none;"
         return f"""
         QPushButton {{
-            background-color: #0078d4;
+            background-color: #2c2f33;
             color: white;
             border: {border}
-            border-radius: 12px;
-            padding: 10px 16px;
+            border-radius: 0px;
+            padding: 8px 16px;
+        }}
+        QPushButton:hover {{
+            background-color: #3a3d41;
+        }}
+        QPushButton:pressed {{
+            background-color: #505357;
         }}
         QPushButton:focus {{ outline: none; }}
         """

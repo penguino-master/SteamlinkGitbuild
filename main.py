@@ -63,6 +63,10 @@ if __name__ == "__main__":
             color: white;
             selection-background-color: #7289da;
         }
+        /* Ensure grid layouts and tiles inherit dark background */
+        QGridLayout {
+            background-color: #1e1e1e;
+        }
     """)
 
     gui = SteamlinkGUI()

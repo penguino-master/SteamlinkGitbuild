@@ -1,0 +1,23 @@
+Focus Navigation Polish (in gui_mainmenu.py):
+
+Add a subtle "selection indicator" like an underline or card highlight. In keyPressEvent, when focusing a sidebar button, add a temporary QLabel or stylesheet tweak (e.g., background: linear-gradient(to bottom, transparent, #0078d4) at the bottom of the focused button) for that Xbox "active tab" slide-in effect.
+Ensure controller input in controller.py has haptic feedback if your Xbox controller supports it (via pygame.joystick rumble on selection).
+
+
+Overall Theme Enhancements (in main.py):
+
+Typography: Add font-family: 'Segoe UI', sans-serif; to the global QWidget stylesheet—Xbox uses a clean, modern sans-serif.
+Cards/Sections: Wrap submenu content (e.g., volume bar, Bluetooth table) in a QFrame with border: 1px solid #50545a; border-radius: 4px; background: #2c2f33; padding: 16px; for Xbox-style "cards."
+Transitions: In switch_page(), add a fade animation using QPropertyAnimation on the stacked layout's opacity for smooth page swaps (Xbox menus slide/fade elegantly).
+
+
+Subtle Animations & Feedback:
+
+Reduce animation_speed default to 200ms in AnimatedButton.__init__ for snappier responses—Xbox feels responsive without being flashy.
+Add sound effects: On button press, play a short .wav (e.g., via pygame.mixer) for that satisfying Xbox click (keep files small for Pi performance).
+
+
+Accessibility/Usability:
+
+High-contrast mode: Toggle a "high contrast" flag in main.py stylesheet to swap greys for bolder blues on focus.
+Grid Responsiveness: In menu_application.py, make the icon grid auto-flow with QGridLayout.setColumnStretch for varying screen sizes (Pi HDMI quirks).
