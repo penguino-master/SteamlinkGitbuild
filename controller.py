@@ -27,7 +27,7 @@ class ControllerThread(Thread):
             print(f"Controller detected: {joystick.get_name()}")
         except Exception as e:
             print(f"Joystick init failed: {e} — Falling back to no controller support.")
-            return  # Or switch to evdev here if you want (see bonus below)
+            return
 
         # Safety check: Does it have hats? (Xbox D-pad is hat 0)
         num_hats = joystick.get_numhats()
@@ -38,9 +38,6 @@ class ControllerThread(Thread):
             print(f"Hats available: {num_hats}")
             self.use_axis_fallback = False
 
-        # Quick fix: Pygame needs a display for reliable joystick events
-        screen = pygame.display.set_mode((1, 1))  # Tiny, invisible surface
-
         clock = pygame.time.Clock()
         running = True
 
@@ -50,8 +47,8 @@ class ControllerThread(Thread):
                     running = False
                     break
 
-                # Hat events (D-pad)
-                elif event.type == pygame.JOYHATMOTION:
+                # Hat events (D-pad) — if available
+                elif event.type == pygame.JOYHATMOTION and not self.use_axis_fallback:
                     if num_hats > event.hat:  # Valid hat index
                         hat_pos = event.value  # (-1/0/1, -1/0/1)
                         now = time.time()
@@ -66,7 +63,7 @@ class ControllerThread(Thread):
                             elif hat_pos == (1, 0):  # Right
                                 QTimer.singleShot(0, lambda: self.gui.handle_key(Qt.Key.Key_Right))
 
-                # Button events (A/B)
+                # Button events (A/B) — always active
                 elif event.type == pygame.JOYBUTTONDOWN:
                     button = event.button
                     now = time.time()
@@ -77,19 +74,27 @@ class ControllerThread(Thread):
                         elif button == 1:  # B = Esc/Back
                             QTimer.singleShot(0, lambda: self.gui.handle_key(Qt.Key.Key_Escape))
 
-            # Fallback polling for axes (if no hats, e.g., some BT quirks)
-            if self.use_axis_fallback:
-                axis_y = joystick.get_axis(1)  # Left stick Y (Xbox standard)
-                deadzone = 0.3
-                if abs(axis_y) > deadzone:
-                    direction = Qt.Key.Key_Up if axis_y < -deadzone else Qt.Key.Key_Down
-                    now = time.time()
-                    if now - self.last_hat_time > self.debounce_delay:
+            # Enhanced fallback: Poll axes for D-pad emulation (Xbox BT standard)
+            if self.use_axis_fallback and joystick:
+                deadzone = 0.3  # Tune for stick drift (higher = less sensitive)
+                axis_x = joystick.get_axis(0)  # Left stick X (left/right)
+                axis_y = joystick.get_axis(1)  # Left stick Y (up/down)
+
+                now = time.time()
+                if now - self.last_hat_time > self.debounce_delay:
+                    # Horizontal (Left/Right)
+                    if abs(axis_x) > deadzone:
+                        direction = Qt.Key.Key_Left if axis_x < -deadzone else Qt.Key.Key_Right
                         self.last_hat_time = now
                         QTimer.singleShot(0, lambda d=direction: self.gui.handle_key(d))
-                # Add X axis for left/right if needed (e.g., axis 0 for horizontal)
 
-            pygame.event.pump()  # Keep SDL alive
-            clock.tick(60)  # Smoother polling
+                    # Vertical (Up/Down) — only if no horizontal to avoid conflicts
+                    elif abs(axis_y) > deadzone:
+                        direction = Qt.Key.Key_Up if axis_y < -deadzone else Qt.Key.Key_Down
+                        self.last_hat_time = now
+                        QTimer.singleShot(0, lambda d=direction: self.gui.handle_key(d))
+
+            pygame.event.pump()  # Keep SDL alive (no display needed)
+            clock.tick(60)  # Smooth 60 FPS polling, low CPU on Zero 2 W
 
         pygame.quit()
