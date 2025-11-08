@@ -9,6 +9,7 @@ from menu_system import SystemMenu
 from menu_volume import VolumeMenu
 from menu_application import ApplicationMenu
 from animated_button import AnimatedButton
+from PyQt6.QtGui import QKeyEvent, QEvent
 import socket
 
 
@@ -85,6 +86,12 @@ class SteamlinkGUI(QWidget):
         # Default focus on first button
         if self.menu_buttons:
             self.menu_buttons[0].setFocus()
+
+        # Controller handling
+        def handle_key(self, key):
+            """Simulate a key press for controller input."""
+            event = QKeyEvent(QEvent.Type.KeyPress, key, Qt.KeyboardModifier.NoModifier)
+            self.keyPressEvent(event)
 
         # Controller input thread
         self.controller_thread = ControllerThread(self)

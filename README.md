@@ -27,26 +27,16 @@ The app is optimized for a semi-headless setup (boots to CLI but supports a grap
 The provided `install.sh` script automates dependency installation, clones/updates the repository, and sets up a system-wide launcher.
 
 ### Step 1: Clone the Repository
-Clone this repository to your Raspberry Pi:
+Clone the install.sh to your Raspberry Pi:
 ```bash
-git clone https://github.com/penguino-master/SteamlinkGitbuild.git
-cd SteamlinkGitbuild
+curl -sL https://raw.githubusercontent.com/penguino-master/SteamlinkGitbuild/main/install.sh | sudo bash
+```
+### Step 2: Run the installer
+```bash
+chmod +x install.sh
+sudo ./install.sh
 ```
 
-### Step 2: Run the Installation Script
-1. Make the script executable:
-   ```bash
-   chmod +x install.sh
-   ```
-2. Run the script with sudo (installs to `/opt/steamlink-gui` and requires root for package installation):
-   ```bash
-   sudo ./install.sh
-   ```
-   The script will:
-   - Install dependencies: `python3`, `python3-pyqt6`, `python3-pygame`, `pulseaudio-utils`, `bluez`, `raspi-config`, `steamlink`.
-   - Clone or update the repo to `/opt/steamlink-gui`.
-   - Create a launcher at `/usr/local/bin/steamlink-gui`.
-   - Set up a default `programs.txt` with a Steam Link entry.
 
 ### Step 3: Verify Installation
 After the script completes, you’ll see:
