@@ -15,16 +15,19 @@ class ControllerThread(Thread):
     def run(self):
         pygame.init()
         pygame.joystick.init()
-        print(f"Controller detected: {joystick.get_name()}")
-        screen = pygame.display.set_mode((1, 1))
 
         if pygame.joystick.get_count() == 0:
             print("No joysticks found—check Bluetooth!")
             return
 
-        joystick = pygame.joystick.Joystick(0)
-        joystick.init()
-        print(f"Controller detected: {joystick.get_name()}")
+        joystick = None
+        try:
+            joystick = pygame.joystick.Joystick(0)
+            joystick.init()
+            print(f"Controller detected: {joystick.get_name()}")
+        except Exception as e:
+            print(f"Joystick init failed: {e} — Falling back to no controller support.")
+            return  # Or switch to evdev here if you want (see bonus below)
 
         # Safety check: Does it have hats? (Xbox D-pad is hat 0)
         num_hats = joystick.get_numhats()
@@ -34,6 +37,9 @@ class ControllerThread(Thread):
         else:
             print(f"Hats available: {num_hats}")
             self.use_axis_fallback = False
+
+        # Quick fix: Pygame needs a display for reliable joystick events
+        screen = pygame.display.set_mode((1, 1))  # Tiny, invisible surface
 
         clock = pygame.time.Clock()
         running = True
@@ -81,7 +87,7 @@ class ControllerThread(Thread):
                     if now - self.last_hat_time > self.debounce_delay:
                         self.last_hat_time = now
                         QTimer.singleShot(0, lambda d=direction: self.gui.handle_key(d))
-                # Add X axis for left/right if needed
+                # Add X axis for left/right if needed (e.g., axis 0 for horizontal)
 
             pygame.event.pump()  # Keep SDL alive
             clock.tick(60)  # Smoother polling
