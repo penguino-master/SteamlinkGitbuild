@@ -110,9 +110,17 @@ class ApplicationMenu(QWidget):
             return btn
 
     def launch_program(self, command):
-        """Launch a program in the background."""
+        """Launch a program. For Steamlink, kill GUI/FB and switch to console."""
         try:
-            subprocess.Popen(command.split())
+            if "steamlink" in command.lower():
+                # Steamlink needs pure console—no GUI/FB
+                import os
+                os.system("pkill -f python3")  # Zap GUI to free resources
+                # Switch to TTY1 (console) and run Steamlink
+                os.system(f"chvt 1 && {command} && echo 'Steamlink ended—run steamlink-kiosk to restart GUI'")
+            else:
+                # Other apps: Run normally
+                subprocess.Popen(command.split())
             print(f"Launched: {command}")
         except Exception as e:
             print(f"Error launching {command}: {e}")

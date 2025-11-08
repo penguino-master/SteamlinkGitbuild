@@ -16,7 +16,21 @@ class SteamlinkGUI(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Steamlink Companion UI")
+
+        # Force fullscreen flags BEFORE layout/show (works on LinuxFB/EGLFS)
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint)
         self.showFullScreen()
+
+        # Explicitly set resolution (1920x1080) - overrides framebuffer
+        self.resize(1920, 1080)
+        self.setFixedSize(1920, 1080)  # Lock it; no resizing accidents
+
+        # Ensure it grabs the primary screen
+        self.move(0, 0)  # Top-left origin
+
+        # Kiosk polish: Hide cursor
+        self.setCursor(Qt.CursorShape.BlankCursor)
+        self.raise_()  # Top if layered (rare on FB)
 
         # Layouts
         layout = QHBoxLayout(self)
@@ -24,7 +38,7 @@ class SteamlinkGUI(QWidget):
         layout.setSpacing(0)
 
         sidebar = QVBoxLayout()
-        sidebar.setContentsMargins(20, 20, 0, 0)  # Added 20px top margin
+        sidebar.setContentsMargins(20, 20, 0, 0)  # 20px top margin
         sidebar.setSpacing(10)
 
         self.pages = QStackedLayout()
@@ -53,8 +67,8 @@ class SteamlinkGUI(QWidget):
 
         for i, (text, widget) in enumerate(buttons_info):
             btn = AnimatedButton(text, lambda t=text: self.switch_page(t), self)
-            btn.setMinimumHeight(100)  # Kept at 100px per your change
-            btn.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)  # Minimum width, fixed height
+            btn.setMinimumHeight(100)
+            btn.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
 
             sidebar.addWidget(btn)
             self.menu_buttons.append(btn)
