@@ -1,56 +1,87 @@
 import pygame
 from threading import Thread
 import time
-from PyQt6.QtCore import QEvent, Qt, QTimer
-from PyQt6.QtGui import QKeyEvent
-from PyQt6.QtWidgets import QApplication
-
+from PyQt6.QtCore import QTimer, Qt
+from PyQt6.QtGui import QKeyEvent  # For simulating keys
 
 class ControllerThread(Thread):
     def __init__(self, gui):
         super().__init__(daemon=True)
         self.gui = gui
+        self.last_hat_time = 0
+        self.last_button_time = {}  # Per-button debounce
+        self.debounce_delay = 0.15  # Faster for Zero 2 W
 
     def run(self):
         pygame.init()
         pygame.joystick.init()
 
         if pygame.joystick.get_count() == 0:
+            print("No joysticks found—check Bluetooth!")
             return
 
         joystick = pygame.joystick.Joystick(0)
         joystick.init()
+        print(f"Controller detected: {joystick.get_name()}")
+
+        # Safety check: Does it have hats? (Xbox D-pad is hat 0)
+        num_hats = joystick.get_numhats()
+        if num_hats == 0:
+            print("Warning: No hats detected—falling back to axis polling for D-pad.")
+            self.use_axis_fallback = True
+        else:
+            print(f"Hats available: {num_hats}")
+            self.use_axis_fallback = False
+
         clock = pygame.time.Clock()
+        running = True
 
-        while True:
-            pygame.event.pump()
-            hat = joystick.get_hat(0)
-            axis_y = joystick.get_axis(1)
+        while running:
+            for event in pygame.event.get():  # Event-driven: Safer than raw polling
+                if event.type == pygame.QUIT:
+                    running = False
+                    break
 
-            # Up / Down
-            if hat[1] == 1 or axis_y < -0.5:
-                QTimer.singleShot(0, lambda: self.gui.handle_key(Qt.Key.Key_Up))
-                time.sleep(0.2)
-            elif hat[1] == -1 or axis_y > 0.5:
-                QTimer.singleShot(0, lambda: self.gui.handle_key(Qt.Key.Key_Down))
-                time.sleep(0.2)
+                # Hat events (D-pad)
+                elif event.type == pygame.JOYHATMOTION:
+                    if num_hats > event.hat:  # Valid hat index
+                        hat_pos = event.value  # (-1/0/1, -1/0/1)
+                        now = time.time()
+                        if now - self.last_hat_time > self.debounce_delay:
+                            self.last_hat_time = now
+                            if hat_pos == (0, 1):  # Up
+                                QTimer.singleShot(0, lambda: self.gui.handle_key(Qt.Key.Key_Up))
+                            elif hat_pos == (0, -1):  # Down
+                                QTimer.singleShot(0, lambda: self.gui.handle_key(Qt.Key.Key_Down))
+                            elif hat_pos == (-1, 0):  # Left
+                                QTimer.singleShot(0, lambda: self.gui.handle_key(Qt.Key.Key_Left))
+                            elif hat_pos == (1, 0):  # Right
+                                QTimer.singleShot(0, lambda: self.gui.handle_key(Qt.Key.Key_Right))
 
-            # Left / Right
-            if hat[0] == -1:
-                QTimer.singleShot(0, lambda: self.gui.handle_key(Qt.Key.Key_Left))
-                time.sleep(0.2)
-            elif hat[0] == 1:
-                QTimer.singleShot(0, lambda: self.gui.handle_key(Qt.Key.Key_Right))
-                time.sleep(0.2)
+                # Button events (A/B)
+                elif event.type == pygame.JOYBUTTONDOWN:
+                    button = event.button
+                    now = time.time()
+                    if button not in self.last_button_time or now - self.last_button_time[button] > self.debounce_delay:
+                        self.last_button_time[button] = now
+                        if button == 0:  # A = Enter
+                            QTimer.singleShot(0, lambda: self.gui.handle_key(Qt.Key.Key_Return))
+                        elif button == 1:  # B = Esc/Back
+                            QTimer.singleShot(0, lambda: self.gui.handle_key(Qt.Key.Key_Escape))
 
-            # A button = Enter
-            if joystick.get_button(0):
-                QTimer.singleShot(0, lambda: self.gui.handle_key(Qt.Key.Key_Return))
-                time.sleep(0.25)
+            # Fallback polling for axes (if no hats, e.g., some BT quirks)
+            if self.use_axis_fallback:
+                axis_y = joystick.get_axis(1)  # Left stick Y (Xbox standard)
+                deadzone = 0.3
+                if abs(axis_y) > deadzone:
+                    direction = Qt.Key.Key_Up if axis_y < -deadzone else Qt.Key.Key_Down
+                    now = time.time()
+                    if now - self.last_hat_time > self.debounce_delay:
+                        self.last_hat_time = now
+                        QTimer.singleShot(0, lambda d=direction: self.gui.handle_key(d))
+                # Add X axis for left/right if needed
 
-            # B button = Escape (could be mapped to "back" later)
-            if joystick.get_button(1):
-                QTimer.singleShot(0, lambda: self.gui.handle_key(Qt.Key.Key_Escape))
-                time.sleep(0.25)
+            pygame.event.pump()  # Keep SDL alive
+            clock.tick(60)  # Smoother polling
 
-            clock.tick(30)
+        pygame.quit()
