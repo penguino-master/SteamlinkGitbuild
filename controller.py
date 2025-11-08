@@ -15,6 +15,8 @@ class ControllerThread(Thread):
     def run(self):
         pygame.init()
         pygame.joystick.init()
+        print(f"Controller detected: {joystick.get_name()}")
+        screen = pygame.display.set_mode((1, 1))
 
         if pygame.joystick.get_count() == 0:
             print("No joysticks found—check Bluetooth!")

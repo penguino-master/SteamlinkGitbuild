@@ -31,19 +31,15 @@ Clone the install.sh to your Raspberry Pi:
 ```bash
 curl -sL https://raw.githubusercontent.com/penguino-master/SteamlinkGitbuild/main/install.sh | sudo bash
 ```
-### Step 2: Run the installer
-```bash
-chmod +x install.sh
-sudo ./install.sh
-```
-### Step 3: Chmod everything
+
+### Step 2: Chmod everything
 ```bash
 cd /opt/steamlink-gui
 chmod +x steamlink-kiosk.sh
 chmod +x kiosk.sh
 ```
 
-### Step 4: Verify Installation
+### Step 3: Verify Installation
 After the script completes, you’ll see:
 ```
 ✅ Installation complete!
