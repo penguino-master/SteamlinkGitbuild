@@ -37,6 +37,21 @@ sudo chmod -R u+rw "$INSTALL_DIR"
 mkdir -p "$INSTALL_DIR/icons"
 echo "Steam Link|steamlink|steamlink.png" > "$INSTALL_DIR/programs.txt"
 
+# Auto-chmod scripts (kiosk.sh and steamlink-kiosk.sh)
+sudo chmod +x "$INSTALL_DIR/kiosk.sh" "$INSTALL_DIR/steamlink-kiosk.sh" 2>/dev/null || true  # Idempotent, ignores if missing
+
+# Clean up any temp home dir leftovers (e.g., ~/steamlink or ~/SteamlinkGitbuild)
+TEMP_HOME_DIR="$USER_HOME/steamlink"
+if [ -d "$TEMP_HOME_DIR" ]; then
+    echo "🧹 Cleaning up temp ~/steamlink dir..."
+    rm -rf "$TEMP_HOME_DIR"
+fi
+TEMP_GIT_DIR="$USER_HOME/SteamlinkGitbuild"
+if [ -d "$TEMP_GIT_DIR" ]; then
+    echo "🧹 Cleaning up temp ~/SteamlinkGitbuild dir..."
+    rm -rf "$TEMP_GIT_DIR"
+fi
+
 # Steamlink if missing
 if ! command -v steamlink; then
     sudo apt install -y steamlink

@@ -36,9 +36,14 @@ curl -sL https://raw.githubusercontent.com/penguino-master/SteamlinkGitbuild/mai
 chmod +x install.sh
 sudo ./install.sh
 ```
+### Step 3: Chmod everything
+```bash
+cd /opt/steamlink-gui
+chmod +x steamlink-kiosk.sh
+chmod +x kiosk.sh
+```
 
-
-### Step 3: Verify Installation
+### Step 4: Verify Installation
 After the script completes, you’ll see:
 ```
 ✅ Installation complete!
@@ -46,7 +51,7 @@ Run the app with: steamlink-gui
 ```
 Test the app:
 ```bash
-steamlink-gui
+./steamlink-kiosk.sh
 ```
 This launches the GUI in full-screen mode. Use a controller (D-pad, A/B buttons) or keyboard (arrows, Enter, Esc) to navigate.
 

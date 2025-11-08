@@ -9,7 +9,8 @@ from menu_system import SystemMenu
 from menu_volume import VolumeMenu
 from menu_application import ApplicationMenu
 from animated_button import AnimatedButton
-from PyQt6.QtGui import QKeyEvent, QEvent
+from PyQt6.QtCore import QEvent
+from PyQt6.QtGui import QKeyEvent
 import socket
 
 
